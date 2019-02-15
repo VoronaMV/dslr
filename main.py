@@ -60,7 +60,11 @@ def multinomial():
                                          model.X.values,
                                          model.y.values)
 
-    res = LogisticRegressionMultinomial.predict(theta, model.X.values, model.y.values)
+    res = LogisticRegressionMultinomial.predict(theta.T, model.X.values, model.y.values)
+
+    theta_df = pd.DataFrame(theta, columns=model.theta.columns.tolist())
+    theta_df.to_csv('res.csv', index=False)
+
     res_list = res.flatten().tolist()
     right = len([i for i in res_list if i is True])
     print(f'True = ', right)
@@ -70,7 +74,22 @@ def multinomial():
     print(right / len(res_list))
 
 
+def predict():
+    df_test = pd.read_csv('dataset_test.csv', index_col='Index')
+    df_test['year'] = df_test['Birthday'].apply(lambda x: int(x.split('-')[0]))
+    df_test['year'] = df_test['year'] - df_test['year'].min()
+    prepared_df = prepare_dataframe(df=df_test, drop_features=UNNESSESARY_FEATURES)
+    model = LogisticRegressionMultinomial(prepared_df)
+    # model.set_target_column(['Hufflepuff', 'Ravenclaw', 'Slytherin', 'Gryffindor'], create=True)
+    model.X = model.frame.copy()
+
+    predicted_theta = pd.read_csv('res.csv')
+    predictions = LogisticRegressionMultinomial.real_predict(predicted_theta.values.T, model.X.values)
+    print()
+
+
 if __name__ == '__main__':
     # import data
     # binary()
     multinomial()
+    predict()

@@ -198,7 +198,7 @@ class LogisticRegressionMultinomial(LogisticRegression):
             prev_cost = current_cost
             prev_theta = theta
 
-        return theta
+        return theta.T
 
     @classmethod
     def predict(cls, theta, X, y):
@@ -206,3 +206,10 @@ class LogisticRegressionMultinomial(LogisticRegression):
         predictions[(predictions == predictions.max(axis=1)[:, None])] = 1.0
         predictions[(predictions != predictions.max(axis=1)[:, None])] = 0.0
         return y == predictions
+
+    @classmethod
+    def real_predict(cls, theta, X):
+        predictions = cls.sigmoid(X @ theta)
+        predictions[(predictions == predictions.max(axis=1)[:, None])] = 1.0
+        predictions[(predictions != predictions.max(axis=1)[:, None])] = 0.0
+        return predictions
